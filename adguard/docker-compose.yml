@@ -1,0 +1,30 @@
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    restart: unless-stopped
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      #- "3000:3000"
+    volumes:
+      - adguard-workdir:/opt/adguardhome/work
+      - adguard-confdir:/opt/adguardhome/conf
+    networks:
+      - traefik-network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.services.adguard.loadbalancer.server.port=3000"
+      - "traefik.http.routers.adguard.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.adguard.entrypoints=websecure"
+      - "traefik.http.routers.adguard.tls.certresolver=myresolver"
+
+volumes:
+  adguard-workdir:
+  adguard-confdir:
+
+networks:
+  traefik-network:
+    external: true

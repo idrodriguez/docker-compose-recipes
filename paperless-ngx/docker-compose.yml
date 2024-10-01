@@ -1,0 +1,82 @@
+services:
+  broker:
+    image: docker.io/library/redis:7
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+
+  db:
+    image: docker.io/library/mariadb:11
+    restart: unless-stopped
+    volumes:
+      - dbdata:/var/lib/mysql
+    environment:
+      MARIADB_HOST: paperless
+      MARIADB_DATABASE: paperless
+      MARIADB_USER: ${MARIADB_USER} 
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+      - gotenberg
+      - tika
+    ports:
+      - "8081:8000"
+    volumes:
+      - data:/usr/src/paperless/data
+      - media:/usr/src/paperless/media
+      - /mnt/ssd/paperless-ngx/export:/usr/src/paperless/export
+      - /mnt/ssd/paperless-ngx/consume:/usr/src/paperless/consume
+    env_file: .env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBENGINE: mariadb
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBUSER: ${PAPERLESS_DBUSER} 
+      PAPERLESS_DBPASS: ${PAPERLESS_DBPASS}
+      PAPERLESS_DBPORT: 3306
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_URL: https://${HOSTNAME}
+    networks:
+      - default
+      - traefik-network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.paperless.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.paperless.entrypoints=websecure"
+      - "traefik.http.routers.paperless.tls.certresolver=myresolver"
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.7
+    restart: unless-stopped
+    # The gotenberg chromium route is used to convert .eml files. We do not
+    # want to allow external content like tracking pixels or even javascript.
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+
+  tika:
+    image: docker.io/apache/tika:latest
+    restart: unless-stopped
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+volumes:
+  data:
+  media:
+  dbdata:
+  redisdata:
+
+networks:
+  traefik-network:
+    external: true

@@ -1,0 +1,10 @@
+.env
+*.env
+letsencrypt/
+letsencrypt/**
+htusers/
+htusers/**
+.htpasswd
+**/.htpasswd
+portainer-data/
+portainer-data/**

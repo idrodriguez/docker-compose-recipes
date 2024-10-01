@@ -1,0 +1,13 @@
+services:
+  presearch-auto-updater:
+    image: presearch/node:latest
+    restart: unless-stopped
+    environment:
+      REGISTRATION_CODE: ${REGISTRATION_CODE}
+    volumes:
+      - presearch-node-storage:/app/node
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+volumes:
+  presearch-node-storage:

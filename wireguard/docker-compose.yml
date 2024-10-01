@@ -1,0 +1,41 @@
+services:
+  wireguardeasy:
+    image: ghcr.io/wg-easy/wg-easy
+    container_name: wireguard-easy
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv4.ip_forward=1
+    environment:
+      - WG_HOST
+      - PASSWORD_HASH
+      - WATCHTOWER_LABEL_ENABLE=true
+    ports:
+      - 51820:51820/udp
+    volumes:
+      - easywireguard-config:/etc/wireguard
+    restart: unless-stopped
+    networks:
+      - traefik-network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - "traefik.enable=true"
+      # https
+      - "traefik.http.services.WireGuardService.loadbalancer.server.port=51821"
+      - "traefik.http.routers.WireGuardRoute.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.WireGuardRoute.entrypoints=websecure"
+      - "traefik.http.routers.WireGuardRoute.tls.certresolver=myresolver"
+      # UDP 
+      - "traefik.udp.routers.wireguard-udp.entrypoints=wireguard"
+      - "traefik.udp.routers.wireguard-udp.service=wireguard-udp-service"
+      - "traefik.udp.services.wireguard-udp-service.loadbalancer.server.port=51820"
+
+volumes:
+  easywireguard-config:
+    driver: local
+
+networks:
+  traefik-network:
+    external: true
