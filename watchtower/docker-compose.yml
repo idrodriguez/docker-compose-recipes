@@ -4,11 +4,11 @@ services:
     container_name: watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.docker/config.json:/config.json
+      - $HOME/.docker/:/config/
     environment:
       - TZ=Europe/Madrid
       - WATCHTOWER_LABEL_ENABLE=true
       - WATCHTOWER_CLEANUP=true
-      - DOCKER_CONFIG=/config.json
+      - DOCKER_CONFIG=/config
     restart: unless-stopped
     command: --interval 43200
