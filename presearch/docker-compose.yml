@@ -8,6 +8,8 @@ services:
       - presearch-node-storage:/app/node
     labels:
       - com.centurylinklabs.watchtower.enable=true
+    dns:
+      - adguardhome 
 
 volumes:
   presearch-node-storage:

@@ -10,5 +10,8 @@ services:
       - WATCHTOWER_LABEL_ENABLE=true
       - WATCHTOWER_CLEANUP=true
       - DOCKER_CONFIG=/config
+    dns:
+      - "1.1.1.1"
+      - "8.8.8.8"
     restart: unless-stopped
     command: --interval 43200

@@ -35,6 +35,9 @@ services:
       - "traefik.http.routers.immich-server.rule=Host(`${HOSTNAME}`)"
       - "traefik.http.routers.immich-server.entrypoints=websecure"
       - "traefik.http.routers.immich-server.tls.certresolver=myresolver"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
 
   immich-machine-learning:
     container_name: immich_machine_learning
