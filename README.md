@@ -35,6 +35,7 @@ Here's a list of the services I'm running in Docker containers on this server:
 8. **Watchtower** - Automatic updates for Docker containers.
 9. **Traefik** - Reverse proxy for managing external access to services.
 10. **WireGuard** - Secure VPN server.
+11. **VaultWarden** - Password Manager API for bitwarden client.
 
 Each service is configured via its own **docker-compose.yml** file, with settings managed primarily through `.env` files for better modularity and security.
 
@@ -61,7 +62,6 @@ This repository was created primarily for **backup purposes**. In case I need to
 
 ## ⚙️ Pending
 
-- Vaultwarden
 - NextCloud
 - Improving security and backup processes.
 

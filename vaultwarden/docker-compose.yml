@@ -1,0 +1,39 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    volumes:
+      - vw-data:/data/
+    networks:
+      - traefik-network
+    environment:
+      - DOMAIN=https://${HOSTNAME}
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+      - SIGNUPS_ALLOWED=false
+      - SIGNUPS_VERIFY=true
+      - PUSH_ENABLED=true
+      - PUSH_INSTALLATION_ID=${INSTALLATION_ID}
+      - PUSH_INSTALLATION_KEY=${INSTALLATION_KEY}
+      - PUSH_RELAY_URI=https://api.bitwarden.eu
+      - PUSH_IDENTITY_URI=https://identity.bitwarden.eu
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_SECURITY=starttls
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.vaultwarden.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.vaultwarden.entrypoints=websecure"
+      - "traefik.http.routers.vaultwarden.tls.certresolver=myresolver"
+
+volumes:
+  vw-data:
+
+networks:
+  traefik-network:
+    external: true
