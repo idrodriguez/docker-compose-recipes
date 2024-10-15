@@ -9,7 +9,8 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
     dns:
-      - adguardhome 
+      - 1.1.1.1
+      - 8.8.8.8
 
 volumes:
   presearch-node-storage:
