@@ -36,6 +36,7 @@ Here's a list of the services I'm running in Docker containers on this server:
 9. **Traefik** - Reverse proxy for managing external access to services.
 10. **WireGuard** - Secure VPN server.
 11. **VaultWarden** - Password Manager API for bitwarden client.
+12. **2Fauth** - WebApp to manage 2FA accounts.
 
 Each service is configured via its own **docker-compose.yml** file, with settings managed primarily through `.env` files for better modularity and security.
 
