@@ -1,0 +1,32 @@
+services:
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    environment:
+      - TZ=Europe/Madrid
+    networks:
+      - traefik-network
+      - shoneys_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9091/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.authelia.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.tls.certresolver=myresolver"
+    restart: always
+
+networks:
+  traefik-network:
+    external: true
+
+  shoneys_network:
+    external: true

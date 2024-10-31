@@ -7,6 +7,9 @@ services:
       - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedByDefault=false"
+      - "--providers.file=true"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
@@ -22,10 +25,12 @@ services:
       - "443:443"
     networks:
       - traefik-network
+      - shoneys_network
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./letsencrypt:/letsencrypt"
       - "./htusers:/htusers:z"
+      - "./dynamic.yml:/etc/traefik/dynamic/dynamic.yml:ro"
     labels:
       - com.centurylinklabs.watchtower.enable=true
       - "traefik.enable=true"
@@ -33,10 +38,18 @@ services:
       - "traefik.http.routers.api.service=api@internal"
       - "traefik.http.routers.api.entrypoints=websecure"
       - "traefik.http.routers.api.tls.certresolver=myresolver"
-      - "traefik.http.middlewares.auth.basicauth.usersFile=/htusers/.htpasswd"
-      - "traefik.http.routers.api.middlewares=auth@docker"
+      # Chain middleware for Authelia
+      - 'traefik.http.middlewares.forward-auth-authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://authelia.conectar.cloud'
+      - 'traefik.http.middlewares.forward-auth-authelia.forwardauth.trustForwardHeader=true'
+      - 'traefik.http.middlewares.forward-auth-authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+      - 'traefik.http.middlewares.forward-headers.headers.customrequestheaders.X-Forwarded-For=true'
+      - 'traefik.http.middlewares.authelia.chain.middlewares=forward-auth-authelia,forward-headers'
+      - 'traefik.http.routers.api.middlewares=authelia'
     restart: always
 
 networks:
   traefik-network:
+    external: true
+
+  shoneys_network:
     external: true

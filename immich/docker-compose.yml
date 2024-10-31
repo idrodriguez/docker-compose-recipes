@@ -35,9 +35,13 @@ services:
       - "traefik.http.routers.immich-server.rule=Host(`${HOSTNAME}`)"
       - "traefik.http.routers.immich-server.entrypoints=websecure"
       - "traefik.http.routers.immich-server.tls.certresolver=myresolver"
+    devices:
+      - /dev/dri:/dev/dri
     dns:
       - 1.1.1.1
       - 8.8.8.8
+    cpus: "0.8"
+    mem_limit: "6g"
 
   immich-machine-learning:
     container_name: immich_machine_learning
@@ -49,6 +53,8 @@ services:
     restart: always
     healthcheck:
       disable: false
+    cpus: "0.4"         
+    mem_limit: "4g"
 
   redis:
     container_name: immich_redis
@@ -75,6 +81,8 @@ services:
       start_period: 5m
     command: ["postgres", "-c", "shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
     restart: always
+    cpus: "0.4"
+    mem_limit: "4g"
 
 volumes:
   model-cache:

@@ -20,6 +20,7 @@ services:
       - "traefik.http.routers.adguard.rule=Host(`${HOSTNAME}`)"
       - "traefik.http.routers.adguard.entrypoints=websecure"
       - "traefik.http.routers.adguard.tls.certresolver=myresolver"
+      - "traefik.http.routers.adguard.middlewares=authelia"
 
 volumes:
   adguard-workdir:

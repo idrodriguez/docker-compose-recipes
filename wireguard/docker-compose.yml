@@ -22,11 +22,6 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
       - "traefik.enable=true"
-      # https
-      - "traefik.http.services.WireGuardService.loadbalancer.server.port=51821"
-      - "traefik.http.routers.WireGuardRoute.rule=Host(`${HOSTNAME}`)"
-      - "traefik.http.routers.WireGuardRoute.entrypoints=websecure"
-      - "traefik.http.routers.WireGuardRoute.tls.certresolver=myresolver"
       # UDP 
       - "traefik.udp.routers.wireguard-udp.entrypoints=wireguard"
       - "traefik.udp.routers.wireguard-udp.service=wireguard-udp-service"

@@ -1,0 +1,73 @@
+services:
+  2fauth:
+    image: 2fauth/2fauth
+    container_name: 2fauth
+    volumes:
+      - 2fauth:/2fauth
+    ports:
+      - 9002:8000/tcp
+    environment:
+      - APP_NAME=2FAuth
+      - APP_ENV=local
+      - APP_TIMEZONE=CET
+      - APP_DEBUG=true
+      - SITE_OWNER=${SITE_OWNER}
+      - APP_KEY=${APP_KEY}
+      - APP_URL=${APP_URL}
+      - ASSET_URL=${APP_URL}
+      - IS_DEMO_APP=false
+      - LOG_CHANNEL=daily
+      - LOG_LEVEL=notice
+      - DB_DATABASE="/srv/database/database.sqlite"
+      - CACHE_DRIVER=file
+      - SESSION_DRIVER=file
+      - MAIL_MAILER=smtp
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_PORT=587
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_ENCRYPTION=${MAIL_ENCRYPTION}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+      - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS}
+      - MAIL_VERIFY_SSL_PEER=${MAIL_VERIFY_SSL_PEER}
+      - THROTTLE_API=60
+      - LOGIN_THROTTLE=5
+      - AUTHENTICATION_GUARD=web-guard
+      - AUTHENTICATION_LOG_RETENTION=365
+      - AUTH_PROXY_HEADER_FOR_USER=null
+      - AUTH_PROXY_HEADER_FOR_EMAIL=null
+      - PROXY_LOGOUT_URL=null
+      - WEBAUTHN_NAME=2FAuth
+      - WEBAUTHN_ID=${WEBAUTHN_ID}
+      - WEBAUTHN_USER_VERIFICATION=preferred
+      - TRUSTED_PROXIES=null
+      - PROXY_FOR_OUTGOING_REQUESTS=null
+      - BROADCAST_DRIVER=log
+      - QUEUE_DRIVER=sync
+      - SESSION_LIFETIME=120
+      - REDIS_HOST=127.0.0.1
+      - REDIS_PASSWORD=null
+      - REDIS_PORT=6379
+      - PUSHER_APP_ID=
+      - PUSHER_APP_KEY=
+      - PUSHER_APP_SECRET=
+      - PUSHER_APP_CLUSTER=mt1
+      - VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+      - VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+      - MIX_ENV=local
+    networks:
+      - traefik-network
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-network"
+      - "traefik.http.routers.2fauth.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.routers.2fauth.entrypoints=websecure"
+      - "traefik.http.routers.2fauth.tls.certresolver=myresolver"
+
+volumes:
+  2fauth:
+
+networks:
+  traefik-network:
+    external: true

@@ -8,3 +8,6 @@ htusers/**
 **/.htpasswd
 portainer-data/
 portainer-data/**
+authelia/config/
+authelia/data/
+dynamic.yml
